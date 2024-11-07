@@ -12,7 +12,7 @@ function JobPage() {
     getJob(jobId).then(setJob);
   }, [jobId])
 
-  console.log('JOB: ', job)
+  console.log('[JobPage] JOB: ', job)
 
 
   if (!job) {
