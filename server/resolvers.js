@@ -1,5 +1,11 @@
 export const resolvers = {
     Query: {
-        greeting: () => 'Hello Akash Desai'
+        job: () => {
+            return {
+                id: '1lkdjfasoasfl2',
+                title: 'Software Developer',
+                description: 'New SWE Dev | role'
+            }
+        }
     }
 }
