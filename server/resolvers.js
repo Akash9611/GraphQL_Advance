@@ -1,6 +1,6 @@
 import { GraphQLError } from 'graphql'
 import { getCompany } from './db/companies.js';
-import { createJob, getJob, getJobs, getJobsByCompany } from './db/jobs.js'
+import { createJob, deleteJob, getJob, getJobs, getJobsByCompany } from './db/jobs.js'
 
 export const resolvers = {
     Query: {
@@ -37,9 +37,11 @@ export const resolvers = {
 
         //! OR Approach 2 for create Mutation - by using input for mutation to create job
         createJob: (_root, { input: { title, description } }) => {
-            const companyId = 'FjcJCHJALA4i' // constant companyId for testing
+            const companyId = 'FjcJCHJALA4i' // constant companyId for testing //todo: set company id by logged in user
             return createJob({ companyId, title, description })
-        }
+        },
+
+        deleteJob: (_root, { id }) => deleteJob(id)
     },
 
     Company: {

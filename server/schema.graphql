@@ -9,6 +9,7 @@ type Mutation {
   # createJob(title: String!, description: String): Job
   # OR Approach 2 for create Mutation - create an input for mutation and use it as follows
   createJob(input: CreateJobInput!): Job
+  deleteJob(id: ID!): Job
 }
 
 type Company {
