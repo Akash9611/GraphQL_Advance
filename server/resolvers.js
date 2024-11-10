@@ -29,7 +29,14 @@ export const resolvers = {
     },
 
     Mutation: {
-        createJob: (_root, { title, description }) => {
+        //!  Approach 1 for create Mutation
+        // createJob: (_root, { title, description }) => {
+        //     const companyId = 'FjcJCHJALA4i' // constant companyId for testing
+        //     return createJob({ companyId, title, description })
+        // }
+
+        //! OR Approach 2 for create Mutation - by using input for mutation to create job
+        createJob: (_root, { input: { title, description } }) => {
             const companyId = 'FjcJCHJALA4i' // constant companyId for testing
             return createJob({ companyId, title, description })
         }

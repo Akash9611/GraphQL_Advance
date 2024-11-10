@@ -5,7 +5,10 @@ type Query {
 }
 
 type Mutation {
-  createJob(title: String!, description: String): Job
+  # Approach 1 for create Mutation
+  # createJob(title: String!, description: String): Job
+  # OR Approach 2 for create Mutation - create an input for mutation and use it as follows
+  createJob(input: CreateJobInput!): Job
 }
 
 type Company {
@@ -21,4 +24,10 @@ type Job {
   title: String!
   description: String
   company: Company #Object Association
+}
+
+# Approach 2 for create Mutation starts here
+input CreateJobInput {
+  title: String!
+  description: String
 }
