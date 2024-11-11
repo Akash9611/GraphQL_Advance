@@ -36,13 +36,12 @@ export const resolvers = {
         // }
 
         //! OR Approach 2 for create Mutation - by using input for mutation to create job
-        createJob: (_root, { input: { title, description } }, { auth }) => {
-            if (!auth) {
+        createJob: (_root, { input: { title, description } }, { user }) => {
+            if (!user) {
                 throw unauthorizedError('Missing User Authentication');
             }
-
-            const companyId = 'FjcJCHJALA4i' // constant companyId for testing //todo: set company id by logged in user
-            return createJob({ companyId, title, description })
+            // console.log('[CreateJob] user: ', user)
+            return createJob({ companyId: user.companyId, title, description }) // The job is get created with the companyId that belongs to the USER who creating the job
         },
 
         updateJob: (_root, { input: { id, title, description } }) => {
