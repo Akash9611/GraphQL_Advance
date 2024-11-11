@@ -1,17 +1,17 @@
 import { ApolloClient, InMemoryCache, gql } from '@apollo/client'
-// import { GraphQLClient, gql } from 'graphql-request'
-import { GraphQLClient } from 'graphql-request'
+// import { GraphQLClient, gql } from 'graphql-request' // // with gql 
+// import { GraphQLClient } from 'graphql-request' ////without gql
 import { getAccessToken } from '../auth';
 
-const client = new GraphQLClient('http://localhost:9000/graphql', {
-  headers: () => {
-    const accessToken = getAccessToken();
-    if (accessToken) {
-      return { 'Authorization': `Bearer ${accessToken}` };
-    }
-    return {};
-  }
-});
+// const client = new GraphQLClient('http://localhost:9000/graphql', {
+//   headers: () => {
+//     const accessToken = getAccessToken();
+//     if (accessToken) {
+//       return { 'Authorization': `Bearer ${accessToken}` };
+//     }
+//     return {};
+//   }
+// });
 
 const apolloClient = new ApolloClient({
   uri: 'http://localhost:9000/graphql',
@@ -27,10 +27,17 @@ export async function createJob({ title, description }) {
       }
     }
   `;
-  const { job } = await client.request(mutation, {
-    input: { title, description }
+  //* With GraphQLClient form graphql-request package
+  // const { job } = await client.request(mutation, {
+  //   input: { title, description }
+  // });
+  // return job;
+
+  const { data } = await apolloClient.mutate({
+    mutation,
+    variables: { input: { title, description } }
   });
-  return job;
+  return data.job;
 }
 
 export async function getCompany(id) {
@@ -49,7 +56,7 @@ export async function getCompany(id) {
     }
     `;
 
-  // With GraphQLClient form graphql-request package
+  //* With GraphQLClient form graphql-request package
   // const { company } = await client.request(query, { id });
   // return company;
 
