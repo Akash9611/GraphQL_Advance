@@ -44,11 +44,29 @@ export const resolvers = {
             return createJob({ companyId: user.companyId, title, description }) // The job is get created with the companyId that belongs to the USER who creating the job
         },
 
-        updateJob: (_root, { input: { id, title, description } }) => {
-            return updateJob({ id, title, description });
+        updateJob: async (_root, { input: { id, title, description } }, { user }) => {
+            if (!user) {
+                throw unauthorizedError('Missing User Authentication');
+            }
+
+            const job = await updateJob({ id, title, description, companyId: user.companyId });
+            if (!job) {
+                throw notFoundError('Job not found with job id: ' + id)
+            }
+            return job;
         },
 
-        deleteJob: (_root, { id }) => deleteJob(id),
+        deleteJob: async (_root, { id }, { user }) => {
+            if (!user) {
+                throw unauthorizedError('Missing User Authentication');
+            }
+
+            const job = await deleteJob(id, user.companyId);
+            if (!job) {
+                throw notFoundError('Job not found with job id: ' + id)
+            }
+            return job;
+        },
     },
 
     Company: {
@@ -62,7 +80,7 @@ export const resolvers = {
 };
 
 function notFoundError(message) {
-    throw new GraphQLError(message, { extensions: { code: 'Not_Found', status: 401 } });
+    throw new GraphQLError(message, { extensions: { code: 'Not_Found', status: 404 } });
 }
 
 function unauthorizedError(message) {
