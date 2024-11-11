@@ -1,4 +1,4 @@
-import { ApolloClient, InMemoryCache, gql } from '@apollo/client'
+import { ApolloClient, ApolloLink, InMemoryCache, concat, createHttpLink, gql } from '@apollo/client'
 // import { GraphQLClient, gql } from 'graphql-request' // // with gql 
 // import { GraphQLClient } from 'graphql-request' ////without gql
 import { getAccessToken } from '../auth';
@@ -13,8 +13,21 @@ import { getAccessToken } from '../auth';
 //   }
 // });
 
+const httpLink = createHttpLink({ uri: 'http://localhost:9000/graphql' });
+
+const authLink = new ApolloLink((operation, forward) => {
+  const accessToken = getAccessToken();
+  if (accessToken) {
+    operation.setContext({
+      headers: { 'Authorization': `Bearer ${accessToken}` }
+    });
+  }
+  return forward(operation);
+})
+
 const apolloClient = new ApolloClient({
-  uri: 'http://localhost:9000/graphql',
+  // uri: 'http://localhost:9000/graphql',
+  link: concat(authLink, httpLink), //concat used to combine multiple links
   cache: new InMemoryCache()
 })
 
@@ -96,7 +109,7 @@ export async function getJob(id) {
 
 export async function getJobs() {
   const query = gql`
-    query{
+    query Jobs{
         jobs {
           id
           title
@@ -108,6 +121,6 @@ export async function getJobs() {
         }
       }
       `;
-  const { data } = await apolloClient.query(query);
+  const { data } = await apolloClient.query({ query });
   return data.jobs;
 }
