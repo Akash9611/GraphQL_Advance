@@ -1,6 +1,6 @@
 import { GraphQLError } from 'graphql'
 import { getCompany } from './db/companies.js';
-import { createJob, deleteJob, getJob, getJobs, getJobsByCompany } from './db/jobs.js'
+import { createJob, deleteJob, getJob, getJobs, getJobsByCompany, updateJob } from './db/jobs.js'
 
 export const resolvers = {
     Query: {
@@ -13,7 +13,7 @@ export const resolvers = {
             // }
             //OR create utility function and use it as follows
             if (!company) {
-                throw NotFoundError('Company Not Found with id ' + id)
+                throw notFoundError('Company Not Found with id ' + id)
             }
             return company;
         },
@@ -21,7 +21,7 @@ export const resolvers = {
         job: async (_root, { id }) => {
             const job = await getJob(id);
             if (!job) {
-                throw NotFoundError('Job not found with id ' + id);
+                throw notFoundError('Job not found with id ' + id);
             }
             return job;
         },
@@ -36,12 +36,20 @@ export const resolvers = {
         // }
 
         //! OR Approach 2 for create Mutation - by using input for mutation to create job
-        createJob: (_root, { input: { title, description } }) => {
+        createJob: (_root, { input: { title, description } }, { auth }) => {
+            if (!auth) {
+                throw unauthorizedError('Missing User Authentication');
+            }
+
             const companyId = 'FjcJCHJALA4i' // constant companyId for testing //todo: set company id by logged in user
             return createJob({ companyId, title, description })
         },
 
-        deleteJob: (_root, { id }) => deleteJob(id)
+        updateJob: (_root, { input: { id, title, description } }) => {
+            return updateJob({ id, title, description });
+        },
+
+        deleteJob: (_root, { id }) => deleteJob(id),
     },
 
     Company: {
@@ -54,10 +62,13 @@ export const resolvers = {
     }
 };
 
-function NotFoundError(message) {
+function notFoundError(message) {
     throw new GraphQLError(message, { extensions: { code: 'Not_Found', status: 401 } });
 }
 
+function unauthorizedError(message) {
+    throw new GraphQLError(message, { extensions: { code: 'UNAUTHORIZED' } })
+}
 function dateFormatter(value) {
     return value.slice(0, 'yyyy-mm-dd'.length);
 }

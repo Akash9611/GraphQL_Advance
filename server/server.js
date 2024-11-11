@@ -11,15 +11,20 @@ const port = process.env.PORT || 9000;
 const app = express();
 app.use(cors(), express.json(), authMiddleware);
 
+app.post('/login', handleLogin);
+
 const typeDefs = await readFile('./schema.graphql', 'utf8');
 
+// Authorization Context
+function getContext({ req }) {
+  return { auth: req.auth }
+}
 // Setup Apollo Server
 const apolloServer = new ApolloServer({ typeDefs, resolvers });
 await apolloServer.start();
 // Graphql API endpoint
-app.use('/graphql', apolloMiddleware(apolloServer));
+app.use('/graphql', apolloMiddleware(apolloServer, { context: getContext }));
 
-app.post('/login', handleLogin);
 
 app.listen({ port }, () => {
   console.log(`Server running on port ${port}`);

@@ -8,6 +8,8 @@ It uses Apollo Server with Express, and GraphQL-Request and Apollo Client as Gra
 ### Create Job Mutation Approach 2 Test Case
 ![Alt text](image.png)
 
+### Update Job Mutation Test Case
+![Alt text](image-2.png)
 
-# To clean up the database and re-create it run the following command
+## To clean up the database and re-create it run the following command
 > `node scripts/create-db.js`
