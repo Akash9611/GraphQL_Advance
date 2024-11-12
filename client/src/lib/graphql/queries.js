@@ -28,7 +28,15 @@ const authLink = new ApolloLink((operation, forward) => {
 const apolloClient = new ApolloClient({
   // uri: 'http://localhost:9000/graphql',
   link: concat(authLink, httpLink), //concat used to combine multiple links
-  cache: new InMemoryCache()
+  cache: new InMemoryCache(),
+
+  // To Use the Fresh API call or latest data on every page visit by calling the API [Because by default it store the data in cache and won't make any api call util the page reloads. Every time you visit the same page it will show you the same data on it[it only calls the API once when you visit the page and stores the data in cache and next time you visit the same page it won't give any call to api, instead it will show the data that is available in cache] To handle API call on every time use following login for every API]
+  // defaultOptions: {
+  //   query:{
+  //     fetchPolicy: 'network-only'
+  //   },
+  //   watchQuery: 'network-only'
+  // }
 })
 
 export async function createJob({ title, description }) {
@@ -121,6 +129,9 @@ export async function getJobs() {
         }
       }
       `;
-  const { data } = await apolloClient.query({ query });
+  const { data } = await apolloClient.query({
+    query,
+    fetchPolicy: 'network-only'
+  });
   return data.jobs;
 }
