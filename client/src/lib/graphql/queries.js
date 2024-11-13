@@ -39,28 +39,185 @@ const apolloClient = new ApolloClient({
   // }
 })
 
+//! Fragments
+const jobDetailsFragment = gql`
+  fragment JobDetail on Job {
+    id
+    title
+    date
+    description
+    company {
+      id
+      name
+    }
+  } 
+`;
+//! Code with fragments concept []
+const jobByIdQuery = gql`
+    query JobById($id: ID!) {
+        job(id: $id) {
+           ...JobDetail
+        }
+    }
+    ${jobDetailsFragment}
+    `;
+
+//! Code with fragments concept
 export async function createJob({ title, description }) {
   const mutation = gql`
-    mutation CreateJob($input: CreateJobInput!){
-      # createJob(input:$input){ ## return result with object keyValue "createJob":{object data}  
-      job: createJob(input:$input){ # renaming the result object keyValue "createJob" to "job" 
-        id
-      }
-    }
-  `;
-  //* With GraphQLClient form graphql-request package
-  // const { job } = await client.request(mutation, {
-  //   input: { title, description }
-  // });
-  // return job;
+        mutation CreateJob($input: CreateJobInput!){
+          # createJob(input:$input){ ## return result with object keyValue "createJob":{object data}  
+          job: createJob(input:$input){ # renaming the result object keyValue "createJob" to "job" 
+           ...JobDetail
+            }
+        }
+        ${jobDetailsFragment}
+      `;
 
   const { data } = await apolloClient.mutate({
     mutation,
-    variables: { input: { title, description } }
+    variables: { input: { title, description } },
+    update: (cache, { data }) => {
+      cache.writeQuery({
+        query: jobByIdQuery,
+        variables: { id: data.job.id }, //Cache need the id or has the id field for storing or matching or finding the data by default
+        data // here return full data we got
+      })
+    }
   });
   return data.job;
 }
 
+//? Code without fragments concept
+//! CreateJob API for manipulating the Cache (to reduce the API call to getJobById API by storing the response of createJob API at the place of getJobById APIs response without calling the getJobById API)
+// const jobByIdQuery = gql`
+//     query JobById($id: ID!) {
+//         job(id: $id) {
+//             id
+//             title
+//             date
+//             description
+//             company {
+//               id
+//               name
+//             }
+//         }
+//     }
+//     `;
+
+//? Code without fragments concept
+// export async function createJob({ title, description }) {
+//   const mutation = gql`
+//         mutation CreateJob($input: CreateJobInput!){
+//           # createJob(input:$input){ ## return result with object keyValue "createJob":{object data}  
+//           job: createJob(input:$input){ # renaming the result object keyValue "createJob" to "job" 
+//             id
+//             title
+//             date
+//             description
+//               company {
+//                 id
+//                 name
+//               }
+//             }
+//         }
+//       `;
+
+//   const { data } = await apolloClient.mutate({
+//     mutation,
+//     variables: { input: { title, description } },
+//     update: (cache, { data }) => {
+//       cache.writeQuery({
+//         query: jobByIdQuery,
+//         variables: { id: data.job.id }, //Cache need the id or has the id field for storing or matching or finding the data by default
+//         data // here return full data we got
+//       })
+//     }
+//   });
+//   return data.job;
+// }
+
+export async function getJob(id) {
+  const { data } = await apolloClient.query({ query: jobByIdQuery, variables: { id } });
+  return data.job;
+}
+
+
+//! CreateJob API without manipulating the cache
+// export async function createJob({ title, description }) {
+//   const mutation = gql`
+//     mutation CreateJob($input: CreateJobInput!){
+//       # createJob(input:$input){ ## return result with object keyValue "createJob":{object data}  
+//       job: createJob(input:$input){ # renaming the result object keyValue "createJob" to "job" 
+//         id
+//       }
+//     }
+//   `;
+//   //* With GraphQLClient form graphql-request package
+//   // const { job } = await client.request(mutation, {
+//   //   input: { title, description }
+//   // });
+//   // return job;
+
+//   const { data } = await apolloClient.mutate({
+//     mutation,
+//     variables: { input: { title, description } }
+//   });
+//   return data.job;
+// }
+
+//! getJobById API without manipulating the cache
+// export async function getJobById(id) {
+//   const query = gql`
+//     query JobById($id: ID!) {
+//         job(id: $id) {
+//             id
+//             title
+//             date
+//             description
+//             company {
+//               id
+//               name
+//             }
+//         }
+//     }
+//     `;
+//   // With GraphQLClient form graphql-request package
+//   // const data = await client.request(query, { id })
+//   // return data.job;
+//   //OR directly extract the job object from the data
+//   // const { job } = await client.request(query, { id })
+//   // return job;
+
+//   // const result = await apolloClient.query({ query, variables: { id } });
+//   // return result.data.job;
+//   //OR with destructuring
+//   const { data } = await apolloClient.query({ query, variables: { id } });
+//   return data.job;
+// }
+
+export async function getJobs() {
+  const query = gql`
+    query Jobs{
+        jobs {
+          id
+          title
+          date
+          company {
+            id
+            name
+          }
+        }
+      }
+      `;
+  const { data } = await apolloClient.query({
+    query,
+    fetchPolicy: 'network-only'
+  });
+  return data.jobs;
+}
+
+//! getCompanyById
 export async function getCompany(id) {
   const query = gql`
     query CompanyById($id: ID!) {
@@ -83,55 +240,4 @@ export async function getCompany(id) {
 
   const { data } = await apolloClient.query({ query, variables: { id } });
   return data.company;
-}
-
-export async function getJob(id) {
-  const query = gql`
-    query JobById($id: ID!) {
-        job(id: $id) {
-            id
-            title
-            date
-            description
-            company {
-              id
-              name
-            }
-        }
-    }
-    `;
-
-  // With GraphQLClient form graphql-request package
-  // const data = await client.request(query, { id })
-  // return data.job;
-  //OR directly extract the job object from the data
-  // const { job } = await client.request(query, { id })
-  // return job;
-
-  // const result = await apolloClient.query({ query, variables: { id } });
-  // return result.data.job;
-  //OR with destructuring
-  const { data } = await apolloClient.query({ query, variables: { id } });
-  return data.job;
-}
-
-export async function getJobs() {
-  const query = gql`
-    query Jobs{
-        jobs {
-          id
-          title
-          date
-          company {
-            id
-            name
-          }
-        }
-      }
-      `;
-  const { data } = await apolloClient.query({
-    query,
-    fetchPolicy: 'network-only'
-  });
-  return data.jobs;
 }
