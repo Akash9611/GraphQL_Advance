@@ -25,7 +25,7 @@ const authLink = new ApolloLink((operation, forward) => {
   return forward(operation);
 })
 
-const apolloClient = new ApolloClient({
+export const apolloClient = new ApolloClient({
   // uri: 'http://localhost:9000/graphql',
   link: concat(authLink, httpLink), //concat used to combine multiple links
   cache: new InMemoryCache(),
@@ -241,3 +241,21 @@ export async function getCompany(id) {
   const { data } = await apolloClient.query({ query, variables: { id } });
   return data.company;
 }
+
+
+//! Here is code we use for useQuery Hook to fetch the data from API
+
+export const companyByIdQuery = gql`
+    query CompanyById($id: ID!) {
+      company(id: $id) {
+        id
+        name
+        description
+        jobs{
+            id
+            date
+            title
+        }
+      }  
+    }
+    `;
