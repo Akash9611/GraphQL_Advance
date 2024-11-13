@@ -53,7 +53,7 @@ const jobDetailsFragment = gql`
   } 
 `;
 //! Code with fragments concept []
-const jobByIdQuery = gql`
+export const jobByIdQuery = gql`
     query JobById($id: ID!) {
         job(id: $id) {
            ...JobDetail
@@ -259,3 +259,17 @@ export const companyByIdQuery = gql`
       }  
     }
     `;
+
+export const jobsQuery = gql`
+query Jobs{
+    jobs {
+      id
+      title
+      date
+      company {
+        id
+        name
+      }
+    }
+  }
+  `;
