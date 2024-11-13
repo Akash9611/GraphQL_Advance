@@ -273,3 +273,29 @@ query Jobs{
     }
   }
   `;
+
+//without fragments concept
+export const createJobMutation = gql`
+mutation CrateJob($input: CreateJobInput!){
+  job: createJob(input: $input){
+      id
+      title
+      date
+      description
+      company {
+        id
+        name
+      }
+  } 
+}
+`
+
+//With fragments concept
+//   export const createJobMutation = gql`
+//   mutation CreateJob($input: CreateJobInput!){
+//     job: createJob(input:$input){ # renaming the result object keyValue "createJob" to "job"
+//      ...JobDetail
+//       }
+//   }
+//   ${jobDetailsFragment}
+// `;
