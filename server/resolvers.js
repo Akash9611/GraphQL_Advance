@@ -1,5 +1,5 @@
 import { GraphQLError } from 'graphql'
-import { getCompany } from './db/companies.js';
+import { companyDataLoader, getCompany } from './db/companies.js';
 import { createJob, deleteJob, getJob, getJobs, getJobsByCompany, updateJob } from './db/jobs.js'
 
 export const resolvers = {
@@ -74,7 +74,11 @@ export const resolvers = {
     },
 
     Job: {
-        company: (job) => getCompany(job.companyId), // Resolver function for Object Association
+        // Without dataLoader package logic
+        // company: (job) => getCompany(job.companyId), // Resolver function for Object Association
+        //! With dataLoader package logic
+        company: (job) => companyDataLoader.load(job.companyId), // Resolver function for Object Association
+
         date: (job) => dateFormatter(job.createdAt)  // Field Conversion. To show date in different format
     }
 };

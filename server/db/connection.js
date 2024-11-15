@@ -14,7 +14,7 @@ export const connection = knex({
 // })
 
 //! In following code we are only extracting necessary context values from `data`- that are {sql, binding}
-connection.on('query', ({ sql, binding }) => {
-  const query = connection.raw(sql, binding).toQuery(); //toQuery is for converting it to string
+connection.on('query', ({ sql, bindings }) => {
+  const query = connection.raw(sql, bindings).toQuery(); //toQuery is for converting it to string
   console.log('[db]: ', query)
 }) // This logic we are implementing for looking at how many time the sql queries are running and how to resolve N+1 problem by using the dataLoader package.
