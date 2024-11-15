@@ -2,35 +2,48 @@ import { useState } from 'react';
 import { createJob, createJobMutation, jobByIdQuery } from '../lib/graphql/queries';
 import { useNavigate } from 'react-router';
 import { useMutation } from '@apollo/client';
+import { useCreateJob } from '../lib/graphql/hooks';
 
 function CreateJobPage() {
   const [title, setTitle] = useState('');
   const [description, setDescription] = useState('');
   const navigate = useNavigate();
-
-  // apolloClient useMutation Hook
-  const [mutate, { loading }] = useMutation(createJobMutation)
+  const { createJob, loading } = useCreateJob()
 
   const handleSubmit = async (event) => {
     event.preventDefault();
-    // { data: { job } }  this is like extracting data like data.job while getting the result/response
-    const { data: { job } } = await mutate({
-      variables: { input: { title, description } },
-      update: (cache, { data }) => {
-        cache.writeQuery({
-          query: jobByIdQuery,
-          variables: { id: data.job.id },
-          data,
-        })
-      }
-    })
 
+    const job = await createJob(title, description);
+    console.log('job created:', job);
+    navigate(`/jobs/${job.id}`)
+  }
 
-    if (job.id) {
-      navigate(`/jobs/${job.id}`)
-    }
-    console.log('should post a new job:', job);
-  };
+  if (loading) {
+    return <div>...Loading</div>
+  }
+
+  //! // apolloClient useMutation Hook at component level
+  // const [mutate, { loading }] = useMutation(createJobMutation)
+
+  // const handleSubmit = async (event) => {
+  //   event.preventDefault();
+  //   // { data: { job } }  this is like extracting data like data.job while getting the result/response
+  //   const { data: { job } } = await mutate({
+  //     variables: { input: { title, description } },
+  //     update: (cache, { data }) => {
+  //       cache.writeQuery({
+  //         query: jobByIdQuery,
+  //         variables: { id: data.job.id },
+  //         data,
+  //       })
+  //     }
+  //   })
+
+  //   if (job.id) {
+  //     navigate(`/jobs/${job.id}`)
+  //   }
+  //   console.log('should post a new job:', job);
+  // };
 
   //With react hooks
   // const handleSubmit = async (event) => {
