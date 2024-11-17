@@ -16,7 +16,7 @@ export async function getCompany(id) {
 //! local or context DataLoader definition for resolving problem of constant cache and make or to make call ro query the database every time to retrieve the latest data. [This function will use in server.js file] Also we can call it as "Per-Request Cache".
 export function createCompanyDataLoader() {
   return new DataLoader(async (ids) => {
-    console.log('[CompanyLoader] Ids:', ids);
+    // console.log('[CompanyLoader] Ids:', ids);
     const companies = await getCompanyTable().select().whereIn('id', ids);
     return ids.map((id) => companies.find((company) => company.id === id));
   })
