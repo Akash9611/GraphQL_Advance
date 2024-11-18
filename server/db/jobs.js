@@ -7,10 +7,13 @@ const getJobTable = () => connection.table('job');
 //   return await getJobTable().select().orderBy('createdAt', 'desc');
 // }
 //! Setting limit for pagination 
-export async function getJobs(limit) {
+export async function getJobs(limit, offset) {
   const query = getJobTable().select().orderBy('createdAt', 'desc');
   if (limit) {
     query.limit(limit);
+  }
+  if (offset) {
+    query.offset(offset);
   }
   return await query;
 }

@@ -1,7 +1,13 @@
 type Query {
   company(id: ID!): Company
   job(id: ID!): Job
-  jobs(limit: Int): [Job!] # Passing limit for pagination
+  jobs(limit: Int, offset: Int): [Job!] # Passing limit for pagination
+  # jobs(limit: Int, offset: Int): JobList # Passing limit for pagination
+}
+
+type JobList {
+  jobs: [Job]!
+  totalCount: Int
 }
 
 type Mutation {

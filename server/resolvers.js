@@ -27,7 +27,7 @@ export const resolvers = {
         },
         // jobs: () => getJobs()
         // Setting Limit for pagination
-        jobs: (_args, { limit }) => getJobs(limit)
+        jobs: (_args, { limit, offset }) => getJobs(limit, offset)
     },
 
     Mutation: {
