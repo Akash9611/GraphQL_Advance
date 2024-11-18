@@ -21,17 +21,17 @@ function HomePage() {
   //   // OR clean code writing 
   //   getJobs().then(setJobs)
   // }, [])
-
+  const totalPages = Math.ceil(jobs.totalCount / SET_PER_PAGE_LIMIT)
   return (
     <div>
       <h1 className="title">
         Job Board
       </h1>
-      <JobList jobs={jobs} />
+      <JobList jobs={jobs.items} />
       <div>
-        <button onClick={() => setCurrentPage(currentPage - 1)}>Prev</button>
+        <button disabled={currentPage === 1} onClick={() => setCurrentPage(currentPage - 1)}>Prev</button>
         <span style={{ 'padding': 10 }}>{currentPage}</span>
-        <button onClick={() => setCurrentPage(currentPage + 1)}>Next</button>
+        <button disabled={totalPages === currentPage} onClick={() => setCurrentPage(currentPage + 1)}>Next</button>
       </div>
     </div>
   );
